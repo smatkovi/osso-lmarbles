@@ -1,3 +1,21 @@
+osso-lmarbles (1.6.38-2+leste1) unstable; urgency=low
+
+  * Maemo Leste (daedalus) and FreeBSD port.
+  * LMarbles' own pictures (GPL, Michael Speck) and a side panel, undo
+    button, dialog and start picture drawn by data/make-art.py, instead of
+    Nokia's osso-graphics-game-lmarbles (not free).
+  * The start screen's settings (running, difficulty, sound) from the
+    session's GConf; libhgw asks for them on the system bus, where Maemo 5
+    had GConf, and the game ended at once.
+  * Only a lasting loss of the input focus pauses the game, not the pointer
+    leaving the window or the focus lost for a moment as the window
+    appears (sdl12-compat).
+  * DejaVu Sans where the N900's Nokia Sans is not; SDL, SDL_mixer and
+    SDL_image by pkg-config; nothing below /usr hard-coded; the plugin as a
+    libtool module.
+
+ -- Sebastian Matkovich <sebastian.matkovich@gmail.com>  Tue, 27 Oct 2026 13:00:00 +0100
+
 osso-lmarbles (1.6.38-1+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor

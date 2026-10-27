@@ -7,7 +7,7 @@ AC_INIT([osso-lmarbles], [1.4.34])
 AC_CONFIG_SRCDIR([src/main.c])
 
 # For automake: generate rules to reproduce config.h, if needed
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 # Initialize automake, takes package name and verison form AC_INIT
 AM_INIT_AUTOMAKE([foreign])
@@ -30,23 +30,13 @@ PKG_CHECK_MODULES(OSSO, libosso )
 AC_SUBST(OSSO_CFLAGS)
 AC_SUBST(OSSO_LIBS)
 
-SDL_CFLAGS=`sdl-config --cflags`
-SDL_LIBS=`sdl-config --libs`
-AC_SUBST(SDL_CFLAGS)
-AC_SUBST(SDL_LIBS)
-
-SDLMIX_LIBS=""
-SDLMIX_CFLAGS=""
-AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio, SDLMIX_LIBS="-lSDL_mixer" SDLMIX_CFLAGS="-DSOUND",, ${SDLmix_PRE_LIBS})
-AC_SUBST(SDLMIX_LIBS)
-AC_SUBST(SDLMIX_CFLAGS)
-
-
-SDLIMAGE_LIBS=""
-SDLIMAGE_CFLAGS=""
-AC_CHECK_LIB(SDL_image, IMG_Load, SDLIMAGE_LIBS="-lSDL_image" SDLIMAGE_CFLAGS="-DUSE_SDL_IMAGE",, ${SDLimage_PRE_LIBS})
-AC_SUBST(SDLIMAGE_LIBS)
-AC_SUBST(SDLIMAGE_CFLAGS)
+dnl SDL 1.2 (or sdl12-compat), its mixer and image libraries, by pkg-config
+dnl (sdl-config would be the build machine's when cross-compiling)
+PKG_CHECK_MODULES(SDL, sdl >= 1.2)
+PKG_CHECK_MODULES(SDLMIX, SDL_mixer,
+  [SDLMIX_CFLAGS="$SDLMIX_CFLAGS -DSOUND"], [SDLMIX_CFLAGS=""; SDLMIX_LIBS=""])
+PKG_CHECK_MODULES(SDLIMAGE, SDL_image,
+  [SDLIMAGE_CFLAGS="$SDLIMAGE_CFLAGS -DUSE_SDL_IMAGE"], [SDLIMAGE_CFLAGS=""; SDLIMAGE_LIBS=""])
 
 
 
@@ -65,20 +55,24 @@ AC_DEFINE_UNQUOTED( GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Name of gettext packag
 ALL_LINGUAS="de_DE en_GB en_US es_ES es_MX fi_FI fr_CA fr_FR it_IT pt_BR ru_RU"
 AM_GLIB_GNU_GETTEXT
 
-wrapperdir=/usr/games/wrapper
+wrapperdir='${prefix}/games/wrapper'
 AC_SUBST(wrapperdir)
 
-lmarblesgfxdir=/usr/games/lmarbles/gfx
+lmarblesgfxdir='${datadir}/osso-lmarbles/gfx'
 AC_SUBST(lmarblesgfxdir)
 
-lmarblessoundsdir=/usr/share/osso-lmarbles/sounds
+lmarblessoundsdir='${datadir}/osso-lmarbles/sounds'
 AC_SUBST(lmarblessoundsdir)
 
-lmarbleslevelsdir=/usr/share/osso-lmarbles/levels
+lmarbleslevelsdir='${datadir}/osso-lmarbles/levels'
 AC_SUBST(lmarbleslevelsdir)
 
-lmarblesprofiledir=/usr/share/osso-lmarbles/profile
+lmarblesprofiledir='${datadir}/osso-lmarbles/profile'
 AC_SUBST(lmarblesprofiledir)
+
+dnl Hildon's icons: the back button
+hildonicondir='${datadir}/icons/hicolor/scalable/hildon'
+AC_SUBST(hildonicondir)
 
 lmarbleslocaledir=${datadir}/locale
 AC_SUBST(lmarbleslocaledir)
@@ -86,7 +80,7 @@ AC_SUBST(lmarbleslocaledir)
 desktopentrydir=${datadir}/applications
 AC_SUBST(desktopentrydir)
 
-hildondesktopentrydir=/usr/share/applications/hildon
+hildondesktopentrydir='${datadir}/applications/hildon'
 AC_SUBST(hildondesktopentrydir)
 
 hildoncpdesktopentrydir='$PKG_CONFIG --variable=desktopentrydir hildon-control-panel'

@@ -38,14 +38,14 @@ config.status: configure
 	CFLAGS="$(CFLAGS)" ./configure \
 		--host=$(DEB_HOST_GNU_TYPE) \
 		--build=$(DEB_BUILD_GNU_TYPE) \
-		--prefix=/usr \
+		--prefix=/usr --sysconfdir=/etc \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info
 
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	./autogen.sh
+	autoreconf --install --force
 	touch configure-stamp
 
 build: build-stamp

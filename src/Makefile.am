@@ -5,7 +5,7 @@ INCLUDES = $(GDEPS_CFLAGS) $(SDL_CFLAGS) $(SDLMIX_CFLAGS) $(SDLIMAGE_CFLAGS)
 #INCLUDES = @GDEPS_CFLAGS@ @SDL_CFLAGS@
 
 bin_PROGRAMS = osso_lmarbles
-launcherdir=@wrapperdir@/games
+launcherdir=$(wrapperdir)/games
 launcher_PROGRAMS = osso_lmarbles.l
 
 osso_lmarbles_CFLAGS= $(INCLUDES) \
@@ -14,6 +14,8 @@ osso_lmarbles_CFLAGS= $(INCLUDES) \
 	-DLMARBLESSOUNDSDIR=\"$(lmarblessoundsdir)\"\
 	-DLMARBLESLEVELSDIR=\"$(lmarbleslevelsdir)\"\
 	-DLMARBLESPROFILEDIR=\"$(lmarblesprofiledir)\"\
+	-DHILDONICONDIR=\"$(hildonicondir)\"\
+	-DDATADIR=\"$(datadir)\"\
 	-DLMARBLESSRCDIR=\"$(top_srcdir)\"\
 	-DPREFIX=\"$(prefix)\" -I$(top_srcdir)\
 	-DSAPP_FUNC=1 $(OSSO_CFLAGS)
@@ -54,5 +56,5 @@ plugindir = @prefix@/lib/osso-lmarbles
 
 plugin_la_LDFLAGS = -export-dynamic -avoid-version -module
 plugin_la_CFLAGS = $(GTK_CFLAGS) $(GCONF_CFLAGS) $(OSSO_CFLAGS) -fPIC
-plugin_so_LIBADD = $(GTK_LIBS) $(GCONF_LIBS) $(OSSO_LIBS) 
+plugin_la_LIBADD = $(GTK_LIBS) $(GCONF_LIBS) $(OSSO_LIBS)
 plugin_la_SOURCES = plugin/plugin.c

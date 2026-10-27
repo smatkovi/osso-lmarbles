@@ -38,6 +38,30 @@ SDL_TimerID escape_timeout = NULL;
 extern HgwContext *sapp_context;
 extern osso_context_t *osso;
 Game gm;
+
+/*
+ * Whether the game's window lost the input focus (or was hidden) for good:
+ * the user left it, the game pauses. Not when only the pointer left it,
+ * and not for a moment: while the game's window appears, the start
+ * screen or the desktop has the focus for some 100 ms (sdl12-compat).
+ */
+static int focus_lost(const SDL_ActiveEvent *a)
+{
+    const Uint8 both = SDL_APPINPUTFOCUS | SDL_APPACTIVE;
+    int k;
+
+    if (a->gain || !(a->state & both))
+        return 0;
+    for (k = 0; k < 10; k++)
+    {
+        SDL_Delay(100);
+        SDL_PumpEvents();
+        if ((SDL_GetAppState() & both) == both)
+            return 0;
+    }
+    return 1;
+}
+
 /* levelset names & levelsets -- levels.h */
 extern char **ls_lst;
 extern int ls_n;
@@ -250,12 +274,12 @@ G_Ini()
     G_LdGSts();
 
     // load board
-    gm.s_brd = SS_Ld(LMARBLESGFXDIR "/board.jpg", SDL_SURFACE_TYPE);
+    gm.s_brd = SS_Ld(LMARBLESGFXDIR "/board.png", SDL_SURFACE_TYPE);
     SDL_SetColorKey(gm.s_brd, 0, 0);
     // load lights
     gm.s_lghts = SS_Ld(LMARBLESGFXDIR "/lights.bmp", SDL_SURFACE_TYPE);
     // load marbles
-    gm.s_mrb = SS_Ld(LMARBLESGFXDIR "/marbles.jpg", SDL_SURFACE_TYPE);
+    gm.s_mrb = SS_Ld(LMARBLESGFXDIR "/marbles.png", SDL_SURFACE_TYPE);
     // load undo button
     gm.s_undo = SS_Ld(LMARBLESGFXDIR "/undo-button.bmp", SDL_SURFACE_TYPE);
     // load pressed undo button
@@ -266,7 +290,7 @@ G_Ini()
         SS_Ld(LMARBLESGFXDIR "/undo-button_dimmed.bmp", SDL_SURFACE_TYPE);
     // load overlay button
     gm.s_ret =
-        SS_Ld("/usr/share/icons/hicolor/scalable/hildon/general_overlay_back.png", SDL_SURFACE_TYPE);
+        SS_Ld(HILDONICONDIR "/general_overlay_back.png", SDL_SURFACE_TYPE);
     // load figure
     gm.s_fig = SS_Ld(LMARBLESGFXDIR "/figure.bmp", SDL_SURFACE_TYPE);
     // load marble frame
@@ -313,10 +337,24 @@ G_Ini()
         ULOG_WARN("cannot init FreeType\n");
     }
 
-    if (FT_New_Face
-        (gm.ft_lib, "/usr/share/fonts/nokia/nosnr.ttf", 0, &gm.ft_fnt))
     {
-        ULOG_WARN("cannot load font\n");
+        /* Nokia Sans of the N900 where there is, else DejaVu Sans */
+        static const char *fonts[] = {
+            "/usr/share/fonts/nokia/nosnr.ttf",
+            DATADIR "/fonts/nokia/nosnr.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/local/share/fonts/dejavu/DejaVuSans.ttf",
+            DATADIR "/fonts/truetype/dejavu/DejaVuSans.ttf",
+            DATADIR "/fonts/dejavu/DejaVuSans.ttf",
+            NULL
+        };
+        int i;
+
+        for (i = 0; fonts[i]; i++)
+            if (FT_New_Face(gm.ft_lib, fonts[i], 0, &gm.ft_fnt) == 0)
+                break;
+        if (!fonts[i])
+            ULOG_WARN("cannot load font\n");
     }
 
     // font size
@@ -674,7 +712,7 @@ G_Run()
                     }
                     break;
                 case SDL_ACTIVEEVENT:
-                    if (ev.active.gain == 0)
+                    if (focus_lost(&ev.active))
                     {
                         trm_gm = leave = 1;
                         exit_callback(0);
@@ -709,7 +747,7 @@ G_Run()
                 switch (ev.type)
                 {
                     case SDL_ACTIVEEVENT:
-                        if (ev.active.gain == 0)    /* Lost focus, event */
+                        if (focus_lost(&ev.active))    /* Lost focus, event */
                         {
                             exit_callback(0);
                         }
@@ -1568,7 +1606,7 @@ G_DrwDlg(int fontsize, char *question,
         switch (e.type)
         {
             case SDL_ACTIVEEVENT:
-                if (e.active.gain == 0)
+                if (focus_lost(&e.active))
                 {
                     trm_gm = leave = 1;
                     exit_callback(0);
@@ -3107,7 +3145,7 @@ FA_Run()
             switch (e.type)
             {
                 case SDL_ACTIVEEVENT:
-                    if (e.active.gain == 0)
+                    if (focus_lost(&e.active))
                     {
                         trm_gm = leave = 1;
                         exit_gm = 1;
@@ -3335,7 +3373,7 @@ BS_Run(float b_lvl, float b_tm)
                     break;
                 case SDL_ACTIVEEVENT:
                     fprintf(stderr, "Got  SDL_ACTIVEEVENT\n");
-                    if (e.active.gain == 0)
+                    if (focus_lost(&e.active))
                     {
                         trm_gm = leave = 1;
                         exiting_needed = 1;

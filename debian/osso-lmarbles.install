@@ -1,7 +1,8 @@
 usr/bin
-usr/lib
+usr/lib/osso-lmarbles/*.so
 usr/games/wrapper
 usr/share/applications
 usr/share/dbus-1
 usr/share/osso-lmarbles
+usr/share/pixmaps
 etc/osso-backup

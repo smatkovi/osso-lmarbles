@@ -1,14 +1,20 @@
 Source: osso-lmarbles
-Section: non-free/misc
+Section: games
 Priority: optional
-Maintainer: Maske Amish <amish.maske@nokia.com>
-Build-Depends: intltool, libhildon1-dev,libtiff5-dev, debhelper (>= 4.0.0), hildon-games-wrapper-dev, libsdl1.2-dev, libfreetype6-dev (>= 2.1.9), libsdl-mixer1.2-dev, libglib2.0-dev, libstdc++-6-dev | libstdc++-5-3.3-dev, osso-games-startup-dev, libgtk2.0-dev, libdbus-glib-1-dev, libosso-dev, libgconf2-dev, libsdl-image1.2-dev
+Maintainer: Sebastian Matkovich <sebastian.matkovich@gmail.com>
+Build-Depends: intltool, libhildon1-dev, debhelper (>= 4.0.0), hildon-games-wrapper-dev, libsdl1.2-dev, libfreetype-dev, libsdl-mixer1.2-dev, libsdl-image1.2-dev, libglib2.0-dev, osso-games-startup-dev, libgtk2.0-dev, libdbus-glib-1-dev, libosso-dev, libgconf2-dev, pkg-config, autoconf, automake, libtool
 Standards-Version: 3.6.0
+XSB-Homepage: https://github.com/smatkovi/osso-lmarbles
+XSBC-Bugtracker: https://github.com/smatkovi/osso-lmarbles/issues
 
 Package: osso-lmarbles
 Architecture: any
-Depends: osso-games-l10n-mr | osso-games-l10n-mr0, osso-games-startup (>= 1.0.21), osso-graphics-game-lmarbles (>= 1.0), ke-recv-l10n-mr | ke-recv-l10n-mr0,  hildon-libs-l10n-mr | hildon-libs-l10n-mr0, ${misc:Depends}, ${shlibs:Depends}
-Description: Osso LMarbles game
+Depends: osso-games-l10n-mr | osso-games-l10n-mr0, osso-games-startup (>= 1.0.21), ke-recv-l10n-mr | ke-recv-l10n-mr0,  hildon-libs-l10n-mr | hildon-libs-l10n-mr0, fonts-dejavu-core, ${misc:Depends}, ${shlibs:Depends}
+Description: Marbles, an Atomix-like puzzle game
+ The Nokia N900's Marbles (LMarbles by Michael Speck): move the marbles
+ until they form the figure. With LMarbles' own pictures (the N900's were
+ Nokia's).
+XB-Maemo-Display-Name: Marbles
 
 Package: osso-lmarbles-dbg
 Architecture: any

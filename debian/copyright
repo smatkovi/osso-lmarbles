@@ -8,3 +8,11 @@ Upstream Author(s): Qi Ouyang <ouyang.qi@nokia.com>
 Copyright:
 
 Copyright (c) 2004, 2005 Nokia Corporation.
+
+LMarbles (src/, data/levels, data/sounds, the pictures in data/gfx taken
+from it): Copyright (C) 2000-2001 Michael Speck <kulkanie@gmx.net>,
+GNU General Public License, version 2 or later (COPYING).
+
+The other pictures in data/gfx and data/osso-games-startup-lmarbles.png
+are drawn by data/make-art.py (2026, Sebastian Matkovich), under the same
+licence.

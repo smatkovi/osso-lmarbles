@@ -29,6 +29,7 @@
 #include <time.h>
 #include <osso-log.h>
 #include <hgw/hgw.h>
+#include <gconf/gconf-client.h>
 #include "menu.h"
 #include "cfg.h"
 #include "levels.h"
@@ -45,6 +46,52 @@ extern HgwContext *sapp_context;
 extern struct timeb t_c, t_lc;
 // quit game quickly ? //
 int trm_gm = 0;
+
+/*
+ * The settings osso-games-startup keeps for the game, from the session's
+ * GConf. libhgw's hgw_conf_request_*() ask for them on the system bus,
+ * where Maemo 5 ran GConf; Maemo Leste and FreeBSD run it on the session
+ * bus, and the game ended at once. 0 when the key has a value.
+ */
+static int startup_conf_get(char *key, GConfValueType type, GConfValue **value)
+{
+    GConfClient *client = gconf_client_get_default();
+    GConfValue *v = gconf_client_get(client, key, NULL);
+
+    g_object_unref(client);
+    if (v == NULL || v->type != type)
+    {
+        if (v)
+            gconf_value_free(v);
+        return 1;
+    }
+    *value = v;
+    return 0;
+}
+
+static int startup_conf_bool(void *ctx, char *key, char *dest)
+{
+    GConfValue *v;
+
+    (void) ctx;
+    if (startup_conf_get(key, GCONF_VALUE_BOOL, &v))
+        return 1;
+    *dest = gconf_value_get_bool(v) ? 1 : 0;
+    gconf_value_free(v);
+    return 0;
+}
+
+static int startup_conf_int(void *ctx, char *key, int *dest)
+{
+    GConfValue *v;
+
+    (void) ctx;
+    if (startup_conf_get(key, GCONF_VALUE_INT, &v))
+        return 1;
+    *dest = gconf_value_get_int(v);
+    gconf_value_free(v);
+    return 0;
+}
 // menu config -- cfg.c //
 extern Cfg cfg;
 // sdl struct //
@@ -176,7 +223,7 @@ lmarbles(int argc, char *argv[])
     sprintf(aux, _("game_ap_marbles_name"));
     SDL_WM_SetCaption(aux, 0);
     tmp = 0;
-    if (hgw_conf_request_bool
+    if (startup_conf_bool
         (sapp_context, "/apps/osso/lmarbles/running", &tmp))
     {
         return 1;
@@ -197,7 +244,7 @@ lmarbles(int argc, char *argv[])
     // get difficulty from startup //
     cfg.diff = 0;
 #ifndef WORKAROUND
-    if (hgw_conf_request_int
+    if (startup_conf_int
         (sapp_context, "/apps/osso/lmarbles/difficulty_level", &cfg.diff))
     {
         cfg.diff = 0;
@@ -207,7 +254,7 @@ lmarbles(int argc, char *argv[])
     // get sound setting from startup //
 
 #ifndef WORKAROUND
-    if (hgw_conf_request_bool
+    if (startup_conf_bool
         (sapp_context, "/apps/osso/lmarbles/enable_sound", &tmp))
     {
         tmp = 0;
@@ -241,7 +288,7 @@ lmarbles(int argc, char *argv[])
 
     // game init //
     G_Ini();
-    if (hgw_conf_request_bool
+    if (startup_conf_bool
         (sapp_context, "/apps/osso/lmarbles/running", &tmp))
     {
         return 1;

@@ -1,4 +1,4 @@
 #Sample service description file
 [D-BUS Service]
 Name=com.nokia.osso_lmarbles
-Exec=@wrapperdir@/games/osso_lmarbles.l
+Exec=@prefix@/games/wrapper/games/osso_lmarbles.l
