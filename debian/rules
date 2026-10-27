@@ -103,7 +103,7 @@ binary-arch: build install
 	dh_install -v --sourcedir=debian/tmp
 	dh_installman
 	dh_link
-	dh_strip --dbg-package=osso-lmarbles
+	dh_strip --dbg-package=osso-lmarbles-dbg
 	dh_compress
 	dh_fixperms
 	dh_installdeb
